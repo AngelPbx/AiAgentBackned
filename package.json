@@ -1,0 +1,11 @@
+{
+  "name": "aibackend",
+  "version": "1.0.0",
+  "description": "This backend is cretaed to use retell ai for agent creation",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "Ravi raj",
+  "license": "ISC"
+}
