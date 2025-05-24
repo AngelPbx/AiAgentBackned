@@ -18,10 +18,6 @@ const upload = multer({ storage });
 const client = new Retell({
   apiKey: process.env.RETELL_API_KEY,
 });
-
-
-
-
 // Route to create knowledge base
 router.post("/store", upload.single('file'), async (req, res) => {
   try {
