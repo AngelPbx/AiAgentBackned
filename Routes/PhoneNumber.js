@@ -38,7 +38,7 @@ router.post("/store", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error?.response || 'Something went wrong'
+      error: error || 'Something went wrong'
     });
   }
 });
@@ -55,7 +55,7 @@ router.get("/all", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error?.response || 'Something went wrong'
+      error: error || 'Something went wrong'
     });
   }
 });
@@ -73,7 +73,7 @@ router.get("/get/:id", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error?.response || 'Something went wrong'
+      error: error || 'Something went wrong'
     });
   }
 });
@@ -91,7 +91,7 @@ router.delete("/delete/:id", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error?.response?.data || 'Something went wrong'
+      error: error || 'Something went wrong'
     });
   }
 });
@@ -130,7 +130,7 @@ router.put("/update/:id", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error?.response?.data || 'Something went wrong'
+      error: error || 'Something went wrong'
     });
   }
 });
