@@ -39,7 +39,7 @@ router.post("/store", async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({
-      success: false,
+      status: false,
       message: "Validation failed",
       error: error.details.map(d => d.message),
     });
@@ -47,13 +47,13 @@ router.post("/store", async (req, res) => {
   try {
     const llmResponse = await client.llm.create(value);
     return res.json({
-      success: true,
+      status: true,
       llm_id: llmResponse.llm_id,
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
-      success: false,
+      status: false,
       message: "Failed to create LLM",
       error: err.message,
     });
@@ -65,13 +65,13 @@ router.get("/all", async (req, res) => {
   try {
     const llmResponse = await client.llm.list();
     return res.json({
-      success: true,
+      status: true,
       llmResponse,
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
-      success: false,
+      status: false,
       message: "Failed to get LLMs",
       error: err.message,
     });
@@ -84,13 +84,13 @@ router.get("/get/:id", async (req, res) => {
     const { id } = req.params;
     const llmResponse = await client.llm.retrieve(id);
     return res.json({
-      success: true,
+      status: true,
       llmResponse,
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
-      success: false,
+      status: false,
       message: "Failed to get LLM",
       error: err.message,
     });
@@ -103,13 +103,13 @@ router.delete("/delete/:id", async (req, res) => {
     const { id } = req.params;
     const llmResponse = await client.llm.delete(id);
     return res.json({
-      success: true,
+      status: true,
       data:"Deleted successfully",
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
-      success: false,
+      status: false,
       message: "Failed to delete LLM",
       error: err.message,
     });
@@ -122,7 +122,7 @@ router.put("/update-llm/:llm_id", async (req, res) => {
 
   if (error) {
     return res.status(400).json({
-      success: false,
+      status: false,
       message: "Validation failed",
       error: error.details.map(d => d.message),
     });
@@ -134,14 +134,14 @@ router.put("/update-llm/:llm_id", async (req, res) => {
     const updateResponse = await client.llm.update(llm_id, value);
 
     return res.json({
-      success: true,
+      status: true,
       message: "LLM updated successfully",
       data: updateResponse,
     });
   } catch (err) {
     console.error("Retell update error:", err.message);
     return res.status(500).json({
-      success: false,
+      status: false,
       message: "Failed to update LLM",
       error: err.message,
     });
