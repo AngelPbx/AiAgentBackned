@@ -5,53 +5,7 @@ require('dotenv').config();
 const Joi = require('joi');
 
 const agentSchema = Joi.object({
-  agent_name: Joi.string().required(),
-  llm_id: Joi.string().required(),
-  recording_enabled: Joi.boolean().required(),
-  voice_id: Joi.string().required(),
-  agent_transfer_config: Joi.object({
-    enabled: Joi.boolean(),
-    target_phone_number: Joi.string(),
-    target_sip_uri: Joi.string()
-  }).optional(),
-  phone_number: Joi.string().optional(),
-  sip_config: Joi.object({
-    username: Joi.string(),
-    password: Joi.string(),
-    domain: Joi.string()
-  }).optional(),
-  agent_behavior_config: Joi.object({
-    interjection_frequency: Joi.string().valid("low", "medium", "high"),
-    speaking_rate: Joi.string().valid("slow", "medium", "fast")
-  }).optional(),
-  tts_config: Joi.object({
-    stability: Joi.number().min(0).max(1),
-    similarity_boost: Joi.number().min(0).max(1)
-  }).optional(),
-  agent_dtmf_config: Joi.object({
-    enabled: Joi.boolean(),
-    interrupt_threshold: Joi.number()
-  }).optional(),
-
-  whisper_config: Joi.object({
-    enabled: Joi.boolean()
-  }).optional(),
-
-  agent_voicemail_config: Joi.object({
-    enabled: Joi.boolean(),
-    timeout_seconds: Joi.number()
-  }).optional(),
-
-  agent_greeting_config: Joi.object({
-    greeting_text: Joi.string(),
-    barge_in_enabled: Joi.boolean()
-  }).optional(),
-
-  agent_reprompt_config: Joi.object({
-    first_reprompt: Joi.string(),
-    second_reprompt: Joi.string(),
-    no_input_timeout_seconds: Joi.number()
-  }).optional()
+  
 
 }).unknown(true); // Allow unknown future fields
 
@@ -60,7 +14,7 @@ const client = new Retell({ apiKey: process.env.RETELL_API_KEY });
 
 // Create new agent
 router.post("/store", async (req, res) => {
-  const { error, value } = agentSchema.validate(req.body);
+  const { error, value } = (req.body);
 
   if (error) {
     return res.status(400).json({
@@ -71,10 +25,10 @@ router.post("/store", async (req, res) => {
   }
 
   try {
-    const response = await client.agent.create(value);
+    const response = await client.agent.create(req.body);
     res.json({
       status: true,
-      agent_id: response.agent_id,
+      agent_id: response,
     });
   } catch (err) {
     console.error("Create agent failed:", err.message);
@@ -138,7 +92,7 @@ router.put("/update-agent/:agent_id", async (req, res) => {
 
   try {
     const { agent_id } = req.params;
-    const response = await client.agent.update(agent_id, value);
+    const response = await client.agent.update(agent_id, req.body);
     res.json({
       status: true,
       data: response,

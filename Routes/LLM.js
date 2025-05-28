@@ -85,7 +85,7 @@ router.get("/get/:id", async (req, res) => {
     const llmResponse = await client.llm.retrieve(id);
     return res.json({
       status: true,
-      llmResponse,
+      data:llmResponse,
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
