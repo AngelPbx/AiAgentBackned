@@ -52,7 +52,7 @@ router.get("/all", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to list calls",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -71,7 +71,7 @@ router.get("/get/:id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to get call",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -90,7 +90,7 @@ router.put("/update/:id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to update call",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -109,7 +109,7 @@ router.delete("/delete/:id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to delete call",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });

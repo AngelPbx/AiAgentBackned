@@ -35,7 +35,7 @@ router.post("/store", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Agent creation failed",
-      error: err.message,
+      error: err,
     });
   }
 });
@@ -53,7 +53,7 @@ router.get("/all", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to list agents",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -73,7 +73,7 @@ router.get("/get/:id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to get agent",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -102,7 +102,7 @@ router.put("/update-agent/:agent_id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to update agent",
-      error: err.message,
+      error: err?.error?.error_message || "Failed to update agent",
     });
   }
 });
@@ -121,7 +121,7 @@ router.delete("/delete/:id", async (req, res) => {
     res.status(500).json({
       status: false,
       message: "Failed to delete agent",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });

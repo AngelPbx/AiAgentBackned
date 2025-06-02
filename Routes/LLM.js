@@ -55,7 +55,7 @@ router.post("/store", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to create LLM",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -73,7 +73,7 @@ router.get("/all", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to get LLMs",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -92,7 +92,7 @@ router.get("/get/:id", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to get LLM",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -111,7 +111,7 @@ router.delete("/delete/:id", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to delete LLM",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
@@ -143,7 +143,7 @@ router.put("/update-llm/:llm_id", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to update LLM",
-      error: err.message,
+      error: err?.error?.error_message,
     });
   }
 });
