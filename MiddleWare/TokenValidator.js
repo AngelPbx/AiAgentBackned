@@ -1,12 +1,12 @@
-import Retell from "retell-sdk";
+const Retell = require("retell-sdk");
 
-export const validateApiKey = (req, res, next) => {
+const validateApiKey = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
       status: false,
-      message: "Missing or invalid Authorization header"
+      message: "Missing or invalid Authorization header",
     });
   }
 
@@ -14,7 +14,7 @@ export const validateApiKey = (req, res, next) => {
   if (!apiKey) {
     return res.status(401).json({
       status: false,
-      message: "API key not provided"
+      message: "API key not provided",
     });
   }
 
@@ -25,7 +25,9 @@ export const validateApiKey = (req, res, next) => {
     return res.status(500).json({
       status: false,
       message: "Failed to initialize Retell client",
-      error: err.message
+      error: err.message,
     });
   }
 };
+
+module.exports = { validateApiKey };
