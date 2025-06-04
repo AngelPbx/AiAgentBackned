@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Retell = require("retell-sdk");
 require("dotenv").config();
-const Retell = require("retell-sdk");
 const { validateApiKey } = require("../MiddleWare/TokenValidator");
 
 // === Route to create batch call ===
