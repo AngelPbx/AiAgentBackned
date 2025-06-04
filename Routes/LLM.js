@@ -2,9 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Retell = require('retell-sdk');
 const Joi = require('joi');
+const { validateApiKey } = require('../MiddleWare/TokenValidator');
 require('dotenv').config();
-
-const client = new Retell({ apiKey: process.env.RETELL_API_KEY });
 
 // === Allowed select values (based on Retell docs) ===
 const ALLOWED_MODELS = [
@@ -20,6 +19,7 @@ const ALLOWED_MODELS = [
   "gemini-2.0-flash-lite"
 ];
 
+// Joi schema for validation
 const schema = Joi.object({
   llm_name: Joi.string(),
   model: Joi.string().valid(...ALLOWED_MODELS),
@@ -31,11 +31,43 @@ const schema = Joi.object({
   voice_id: Joi.string(),
   tool_ids: Joi.array().items(Joi.string()),
   tool_config: Joi.object()
-}).unknown(true); //     This line allows extra keys
+}).unknown(true);
 
+// === Middleware: Validate Bearer Token and attach Retell client ===
+// const validateApiKey = (req, res, next) => {
+//   const authHeader = req.headers.authorization;
 
-// Route to create LLM
-router.post("/store", async (req, res) => {
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     return res.status(401).json({
+//       status: false,
+//       message: "Missing or invalid Authorization header"
+//     });
+//   }
+
+//   const apiKey = authHeader.split(" ")[1];
+//   if (!apiKey) {
+//     return res.status(401).json({
+//       status: false,
+//       message: "API key not provided"
+//     });
+//   }
+
+//   try {
+//     req.retellClient = new Retell({ apiKey });
+//     next();
+//   } catch (err) {
+//     return res.status(500).json({
+//       status: false,
+//       message: "Failed to initialize Retell client",
+//       error: err.message
+//     });
+//   }
+// };
+
+// === Routes ===
+
+// Create LLM
+router.post("/store", validateApiKey, async (req, res) => {
   const { error, value } = schema.validate(req.body);
   if (error) {
     return res.status(400).json({
@@ -44,8 +76,9 @@ router.post("/store", async (req, res) => {
       error: error.details.map(d => d.message),
     });
   }
+
   try {
-    const llmResponse = await client.llm.create(value);
+    const llmResponse = await req.retellClient.llm.create(value);
     return res.json({
       status: true,
       llm_id: llmResponse.llm_id,
@@ -55,15 +88,15 @@ router.post("/store", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to create LLM",
-      error: err.message,
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Route to get all LLMs
-router.get("/all", async (req, res) => {
+// Get all LLMs
+router.get("/all", validateApiKey, async (req, res) => {
   try {
-    const llmResponse = await client.llm.list();
+    const llmResponse = await req.retellClient.llm.list();
     return res.json({
       status: true,
       llmResponse,
@@ -73,51 +106,51 @@ router.get("/all", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to get LLMs",
-      error: err.message,
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Rote to get llm by id
-router.get("/get/:id", async (req, res) => {
+// Get LLM by ID
+router.get("/get/:id", validateApiKey, async (req, res) => {
   try {
     const { id } = req.params;
-    const llmResponse = await client.llm.retrieve(id);
+    const llmResponse = await req.retellClient.llm.retrieve(id);
     return res.json({
       status: true,
-      llmResponse,
+      data: llmResponse,
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
       status: false,
       message: "Failed to get LLM",
-      error: err.message,
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Detele llm by id
-router.delete("/delete/:id", async (req, res) => {
+// Delete LLM by ID
+router.delete("/delete/:id", validateApiKey, async (req, res) => {
   try {
     const { id } = req.params;
-    const llmResponse = await client.llm.delete(id);
+    await req.retellClient.llm.delete(id);
     return res.json({
       status: true,
-      data:"Deleted successfully",
+      data: "Deleted successfully",
     });
   } catch (err) {
     console.error("Retell API error:", err.message);
     return res.status(500).json({
       status: false,
       message: "Failed to delete LLM",
-      error: err.message,
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Edit existing llm by id
-router.put("/update-llm/:llm_id", async (req, res) => {
+// Update LLM by ID
+router.put("/update-llm/:llm_id", validateApiKey, async (req, res) => {
   const { error, value } = schema.validate(req.body);
 
   if (error) {
@@ -131,8 +164,7 @@ router.put("/update-llm/:llm_id", async (req, res) => {
   const llm_id = req.params.llm_id;
 
   try {
-    const updateResponse = await client.llm.update(llm_id, value);
-
+    const updateResponse = await req.retellClient.llm.update(llm_id, value);
     return res.json({
       status: true,
       message: "LLM updated successfully",
@@ -143,12 +175,9 @@ router.put("/update-llm/:llm_id", async (req, res) => {
     return res.status(500).json({
       status: false,
       message: "Failed to update LLM",
-      error: err.message,
+      error: err?.error?.error_message || err.message,
     });
   }
 });
-
-
-
 
 module.exports = router;
