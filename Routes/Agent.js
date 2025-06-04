@@ -1,127 +1,125 @@
 const express = require('express');
 const router = express.Router();
 const Retell = require('retell-sdk');
-require('dotenv').config();
 const Joi = require('joi');
+const { validateApiKey } = require('../MiddleWare/TokenValidator');
 
-const agentSchema = Joi.object({
-  
 
-}).unknown(true); // Allow unknown future fields
 
-const client = new Retell({ apiKey: process.env.RETELL_API_KEY });
+// === Joi Schema (optional validation) ===
+const agentSchema = Joi.object({}).unknown(true); // Allow unknown future fields
 
+// === Routes ===
 
 // Create new agent
-router.post("/store", async (req, res) => {
-  const { error, value } = (req.body);
+router.post('/store', validateApiKey, async (req, res) => {
+  const { error } = agentSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({
       status: false,
-      message: "Validation error",
+      message: 'Validation error',
       errors: error.details.map(d => d.message),
     });
   }
 
   try {
-    const response = await client.agent.create(req.body);
+    const response = await req.retellClient.agent.create(req.body);
     res.json({
       status: true,
       agent_id: response,
     });
   } catch (err) {
-    console.error("Create agent failed:", err.message);
+    console.error('Create agent failed:', err.message);
     res.status(500).json({
       status: false,
-      message: "Agent creation failed",
-      error: err,
+      message: 'Agent creation failed',
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
 // List all agents
-router.get("/all", async (req, res) => {
+router.get('/all', validateApiKey, async (req, res) => {
   try {
-    const response = await client.agent.list();
+    const response = await req.retellClient.agent.list();
     res.json({
       status: true,
       data: response,
     });
   } catch (err) {
-    console.error("List agents failed:", err.message);
+    console.error('List agents failed:', err.message);
     res.status(500).json({
       status: false,
-      message: "Failed to list agents",
-      error: err?.error?.error_message,
+      message: 'Failed to list agents',
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-
-// Get agent by id
-router.get("/get/:id", async (req, res) => {
+// Get agent by ID
+router.get('/get/:id', validateApiKey, async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await client.agent.retrieve(id);
+    const response = await req.retellClient.agent.retrieve(id);
     res.json({
       status: true,
       data: response,
     });
   } catch (err) {
-    console.error("Get agent failed:", err.message);
+    console.error('Get agent failed:', err.message);
     res.status(500).json({
       status: false,
-      message: "Failed to get agent",
-      error: err?.error?.error_message,
+      message: 'Failed to get agent',
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Update agent by id
-router.put("/update-agent/:agent_id", async (req, res) => {
-  const { error, value } = agentSchema.validate(req.body);
+// Update agent by ID
+router.put('/update-agent/:agent_id', validateApiKey, async (req, res) => {
+  const { error } = agentSchema.validate(req.body);
 
   if (error) {
     return res.status(400).json({
       status: false,
-      message: "Validation error",
+      message: 'Validation error',
       errors: error.details.map(d => d.message),
     });
   }
 
   try {
     const { agent_id } = req.params;
-    const response = await client.agent.update(agent_id, req.body);
+    const response = await req.retellClient.agent.update(agent_id, req.body);
     res.json({
       status: true,
       data: response,
     });
   } catch (err) {
-    console.error("Update agent failed:", err.message);
+    console.error('Update agent failed:', err.message);
     res.status(500).json({
       status: false,
-      message: "Failed to update agent",
-      error: err?.error?.error_message || "Failed to update agent",
+      message: 'Failed to update agent',
+      error: err?.error?.error_message || err.message,
     });
   }
 });
 
-// Delete agent by id
-router.delete("/delete/:id", async (req, res) => {
+// Delete agent by ID
+router.delete('/delete/:id', validateApiKey, async (req, res) => {
   try {
     const { id } = req.params;
-    const response = await client.agent.delete(id);
+    const response = await req.retellClient.agent.delete(id);
     res.json({
       status: true,
       data: response,
     });
   } catch (err) {
-    console.error("Delete agent failed:", err.message);
+    console.error('Delete agent failed:', err.message);
     res.status(500).json({
       status: false,
-      message: "Failed to delete agent",
-      error: err?.error?.error_message,
+      message: 'Failed to delete agent',
+      error: err?.error?.error_message || err.message,
     });
   }
 });

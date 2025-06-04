@@ -1,25 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const Retell = require('retell-sdk');
-require('dotenv').config();
+const { validateApiKey } = require('../MiddleWare/TokenValidator');
 
-const client = new Retell({ apiKey: process.env.RETELL_API_KEY });
 
-// Route to create phone number
-router.post("/store", async (req, res) => {
+
+// === Route to create batch call ===
+router.post('/store', validateApiKey, async (req, res) => {
   try {
     const {
       from_number,
       tasks,
       name,
-      trigger_timestamp,
-    } = req;
+      trigger_timestamp
+    } = req.body;
 
-    const phoneNumberResponse = await client.batchCall.createBatchCall({
+    const phoneNumberResponse = await req.retellClient.batchCall.createBatchCall({
       from_number,
       tasks,
       name,
-      trigger_timestamp,
+      trigger_timestamp
     });
 
     res.status(200).json({
@@ -30,7 +30,8 @@ router.post("/store", async (req, res) => {
     console.error('Retell API error:', error?.response?.data || error.message);
     res.status(500).json({
       status: false,
-      error: error || 'Something went wrong'
+      message: 'Failed to create batch call',
+      error: error?.response?.data || error.message,
     });
   }
 });
