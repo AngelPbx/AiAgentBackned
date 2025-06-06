@@ -27,7 +27,7 @@ router.post('/store', validateApiKey, async (req, res) => {
     const response = await req.retellClient.agent.create(req.body);
     res.json({
       status: true,
-      agent_id: response,
+      data: response,
     });
   } catch (err) {
     console.error('Create agent failed:', err.message);
