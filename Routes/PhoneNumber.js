@@ -150,4 +150,24 @@ router.put("/update/:id", async (req, res) => {
   }
 });
 
+// === Import phone nnumbers ===
+router.post("/import", async (req, res) => {
+  try {
+    const client = req.retellClient;
+    const phoneNumberResponse = await client.phoneNumber.import(req.body);
+
+    res.status(200).json({
+      status: true,
+      data: phoneNumberResponse
+    });
+  } catch (error) {
+    console.error('Retell API error:', error?.response?.data || error.message);
+    res.status(500).json({
+      status: false,
+      message: 'Failed to import phone numbers',
+      error: error.message
+    });
+  }
+});
+
 module.exports = router;

@@ -35,7 +35,7 @@ router.get("/all", async (req, res) => {
     const response = await req.retellClient.call.list();
     res.json({ status: true, data: response });
   } catch (err) {
-    console.error("List calls failed:", err.message);
+    console.error("List calls failed:", err);
     res.status(500).json({
       status: false,
       message: "Failed to list calls",
